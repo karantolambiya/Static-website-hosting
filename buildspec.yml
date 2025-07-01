@@ -1,17 +1,21 @@
-version: 0.2
+version: 2.1
 
-phases:
-  install:
-    commands:
-      - echo "Installing..."
-  build:
-    commands:
-      - echo "No build step required for static site"
-  post_build:
-    commands:
-      - echo "Deploying to S3..."
-      - aws s3 sync . s3://my-static-website-pipeline --delete
+jobs:
+  deploy:
+    docker:
+      - image: cimg/aws:2023.04.1
+    steps:
+      - checkout
+      - run:
+          name: Lets deploy thsi application
+          command: |
+            ls
+            aws s3 sync . s3://$AWS_S3_BUCKET/
 
-artifacts:
-  files:
-    - '**/*'
+workflows:
+  Production:
+    jobs:
+      - deploy:
+          filters:
+            branches:
+              only: main
